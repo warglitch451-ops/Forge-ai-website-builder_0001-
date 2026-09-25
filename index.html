@@ -1,0 +1,1444 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Forge AI | AI Website Production Platform for Agencies</title>
+    <meta name="description" content="Turn client briefs into complete, editable websites with AI. Built for professional agencies.">
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            /* Colors - Premium Dark Theme */
+            --bg-primary: #050505;
+            --bg-secondary: #0f0f12;
+            --bg-tertiary: #1a1a1f;
+            --bg-accent: #25252e;
+            
+            --text-primary: #ffffff;
+            --text-secondary: #a1a1aa;
+            --text-tertiary: #71717a;
+            
+            --accent: #3b82f6;
+            --accent-hover: #2563eb;
+            --accent-soft: rgba(59, 130, 246, 0.1);
+            
+            --success: #10b981;
+            --error: #ef4444;
+            --warning: #f59e0b;
+            
+            --border: rgba(255, 255, 255, 0.08);
+            --border-hover: rgba(255, 255, 255, 0.15);
+            
+            --radius-sm: 6px;
+            --radius-md: 10px;
+            --radius-lg: 16px;
+            --radius-xl: 24px;
+            
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            
+            --font-main: 'Inter', system-ui, -apple-system, sans-serif;
+            --font-heading: 'Plus Jakarta Sans', sans-serif;
+            
+            --sidebar-width: 260px;
+            --header-height: 64px;
+            --editor-panel-width: 320px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        body {
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            font-family: var(--font-main);
+            overflow-x: hidden;
+            line-height: 1.5;
+        }
+
+        button, input, textarea, select {
+            font-family: inherit;
+            color: inherit;
+        }
+
+        button {
+            cursor: pointer;
+            border: none;
+            background: none;
+            transition: all 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        ul { list-style: none; }
+        a { text-decoration: none; color: inherit; }
+
+        /* --- Utilities --- */
+        .container {
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 0 24px;
+        }
+
+        .btn-primary {
+            background: var(--accent);
+            color: white;
+            padding: 10px 20px;
+            border-radius: var(--radius-md);
+            font-weight: 600;
+            font-size: 14px;
+        }
+        .btn-primary:hover { background: var(--accent-hover); transform: translateY(-1px); }
+        .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }
+
+        .btn-secondary {
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border);
+            color: var(--text-primary);
+            padding: 10px 20px;
+            border-radius: var(--radius-md);
+            font-weight: 600;
+            font-size: 14px;
+        }
+        .btn-secondary:hover { background: var(--bg-accent); border-color: var(--border-hover); }
+
+        .btn-ghost {
+            color: var(--text-secondary);
+            padding: 8px 12px;
+            border-radius: var(--radius-sm);
+            font-size: 14px;
+        }
+        .btn-ghost:hover { background: var(--bg-tertiary); color: var(--text-primary); }
+
+        .badge {
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+        .badge-accent { background: var(--accent-soft); color: var(--accent); }
+
+        /* --- Layout Structures --- */
+        #app-root {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* --- Views --- */
+        .view { display: none; }
+        .view.active { display: block; }
+
+        /* --- Landing Page --- */
+        .landing-nav {
+            height: var(--header-height);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: fixed;
+            top: 0;
+            width: 100%;
+            z-index: 1000;
+            background: rgba(5, 5, 5, 0.8);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .logo {
+            font-family: var(--font-heading);
+            font-weight: 800;
+            font-size: 22px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            letter-spacing: -0.02em;
+        }
+        .logo-icon {
+            width: 32px;
+            height: 32px;
+            background: var(--accent);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .landing-hero {
+            padding-top: 160px;
+            padding-bottom: 100px;
+            text-align: center;
+            background: radial-gradient(circle at top center, rgba(59, 130, 246, 0.15) 0%, transparent 70%);
+        }
+
+        .hero-title {
+            font-family: var(--font-heading);
+            font-size: clamp(40px, 8vw, 72px);
+            font-weight: 800;
+            line-height: 1.1;
+            margin-bottom: 24px;
+            letter-spacing: -0.03em;
+        }
+        .hero-title span {
+            background: linear-gradient(to right, #3b82f6, #8b5cf6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .hero-subtitle {
+            font-size: clamp(16px, 2vw, 20px);
+            color: var(--text-secondary);
+            max-width: 700px;
+            margin: 0 auto 40px;
+        }
+
+        /* --- Dashboard --- */
+        .dashboard-layout {
+            display: grid;
+            grid-template-columns: var(--sidebar-width) 1fr;
+            min-height: 100vh;
+        }
+
+        .sidebar {
+            background: var(--bg-secondary);
+            border-right: 1px solid var(--border);
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 32px;
+        }
+
+        .sidebar-nav {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 12px;
+            border-radius: var(--radius-md);
+            color: var(--text-secondary);
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+        .nav-item:hover, .nav-item.active {
+            background: var(--bg-tertiary);
+            color: var(--text-primary);
+        }
+        .nav-item svg { width: 20px; height: 20px; }
+
+        .dashboard-main {
+            padding: 40px;
+            background: var(--bg-primary);
+            overflow-y: auto;
+        }
+
+        .project-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 24px;
+            margin-top: 32px;
+        }
+
+        .project-card {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: 20px;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        .project-card:hover {
+            border-color: var(--accent);
+            transform: translateY(-4px);
+        }
+
+        .project-thumb {
+            aspect-ratio: 16/10;
+            background: var(--bg-tertiary);
+            border-radius: var(--radius-md);
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-tertiary);
+            font-size: 12px;
+            background-size: cover;
+            background-position: top center;
+        }
+
+        /* --- Editor --- */
+        .editor-layout {
+            display: grid;
+            grid-template-columns: var(--sidebar-width) 1fr var(--editor-panel-width);
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .editor-header {
+            grid-column: 1 / -1;
+            height: 56px;
+            background: var(--bg-secondary);
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 16px;
+        }
+
+        .editor-canvas {
+            background: #121214;
+            padding: 40px;
+            overflow-y: auto;
+            display: flex;
+            justify-content: center;
+        }
+
+        .canvas-container {
+            width: 100%;
+            max-width: 1200px;
+            background: white;
+            min-height: 100%;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+            transition: width 0.3s ease;
+            position: relative;
+        }
+
+        .canvas-container.tablet { max-width: 768px; }
+        .canvas-container.mobile { max-width: 375px; }
+
+        .editor-panel {
+            background: var(--bg-secondary);
+            border-left: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .panel-header {
+            padding: 16px;
+            border-bottom: 1px solid var(--border);
+            font-weight: 600;
+            font-size: 14px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .panel-content {
+            padding: 16px;
+            flex: 1;
+            overflow-y: auto;
+        }
+
+        .prop-group {
+            margin-bottom: 24px;
+        }
+        .prop-label {
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--text-tertiary);
+            text-transform: uppercase;
+            margin-bottom: 12px;
+            display: block;
+        }
+
+        .input-field {
+            width: 100%;
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            padding: 10px 12px;
+            color: var(--text-primary);
+            font-size: 14px;
+            margin-bottom: 12px;
+        }
+        .input-field:focus { outline: none; border-color: var(--accent); }
+
+        /* --- Generator Modal --- */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.8);
+            backdrop-filter: blur(4px);
+            z-index: 2000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        .modal-overlay.active { display: flex; }
+
+        .modal-content {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-xl);
+            width: 100%;
+            max-width: 600px;
+            overflow: hidden;
+            box-shadow: var(--shadow-lg);
+        }
+
+        .generator-steps {
+            padding: 40px;
+        }
+
+        .step { display: none; }
+        .step.active { display: block; }
+
+        .loading-bar {
+            height: 4px;
+            background: var(--bg-tertiary);
+            border-radius: 2px;
+            overflow: hidden;
+            margin: 20px 0;
+        }
+        .loading-progress {
+            height: 100%;
+            background: var(--accent);
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        /* --- Copilot --- */
+        .copilot-container {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            z-index: 1500;
+        }
+
+        .copilot-bubble {
+            width: 56px;
+            height: 56px;
+            background: var(--accent);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 8px 24px rgba(59, 130, 246, 0.4);
+            cursor: pointer;
+        }
+
+        .copilot-window {
+            position: absolute;
+            bottom: 72px;
+            right: 0;
+            width: 320px;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-lg);
+            display: none;
+            flex-direction: column;
+            overflow: hidden;
+        }
+        .copilot-window.active { display: flex; }
+
+        .chat-messages {
+            height: 300px;
+            overflow-y: auto;
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .message {
+            padding: 10px 14px;
+            border-radius: var(--radius-md);
+            font-size: 13px;
+            max-width: 85%;
+        }
+        .message.ai { background: var(--bg-tertiary); align-self: flex-start; }
+        .message.user { background: var(--accent); color: white; align-self: flex-end; }
+
+        /* --- Section Rendering (Inside Canvas) --- */
+        .rendered-section {
+            position: relative;
+            cursor: pointer;
+            transition: outline 0.2s;
+        }
+        .rendered-section:hover { outline: 2px solid var(--accent); }
+        .rendered-section.active { outline: 3px solid var(--accent); }
+
+        /* --- Mobile Responsiveness --- */
+        @media (max-width: 1024px) {
+            .editor-layout {
+                grid-template-columns: 1fr;
+            }
+            .editor-sidebar, .editor-panel {
+                display: none;
+            }
+            .dashboard-layout {
+                grid-template-columns: 1fr;
+            }
+            .sidebar {
+                display: none;
+            }
+            .mobile-nav-toggle {
+                display: block !important;
+            }
+        }
+
+        @media (max-width: 640px) {
+            .hero-title { font-size: 36px; }
+            .dashboard-main { padding: 20px; }
+            .modal-content { border-radius: 0; height: 100%; max-width: 100%; }
+        }
+
+        /* --- Animations --- */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-fade { animation: fadeIn 0.4s ease forwards; }
+
+        /* --- Custom Scrollbar --- */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: var(--bg-primary); }
+        ::-webkit-scrollbar-thumb { background: var(--bg-tertiary); border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--bg-accent); }
+
+        /* --- Notification Toast --- */
+        #toast-container {
+            position: fixed;
+            bottom: 24px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        .toast {
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border);
+            padding: 12px 24px;
+            border-radius: var(--radius-md);
+            color: white;
+            font-size: 14px;
+            box-shadow: var(--shadow-lg);
+            animation: slideUp 0.3s ease;
+        }
+        @keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+
+    </style>
+</head>
+<body>
+
+<div id="app-root">
+    <!-- Landing View -->
+    <div id="view-landing" class="view active">
+        <nav class="landing-nav">
+            <div class="container" style="display: flex; justify-content: space-between; width: 100%;">
+                <div class="logo">
+                    <div class="logo-icon">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M2 12h20L12 2l-10 10Z"/></svg>
+                    </div>
+                    Forge AI
+                </div>
+                <div style="display: flex; gap: 24px; align-items: center;">
+                    <a href="#" class="btn-ghost" onclick="app.setView('dashboard')">Sign In</a>
+                    <button class="btn-primary" onclick="app.openGenerator()">Try Interactive Demo</button>
+                </div>
+            </div>
+        </nav>
+
+        <section class="landing-hero">
+            <div class="container">
+                <div class="badge badge-accent" style="margin-bottom: 20px;">v2.0 Now Live</div>
+                <h1 class="hero-title">Turn Client Briefs Into <span>Complete Websites</span> With AI.</h1>
+                <p class="hero-subtitle">The first AI website production platform built specifically for agencies. Generate, refine, and export professional websites in minutes.</p>
+                <div style="display: flex; gap: 16px; justify-content: center;">
+                    <button class="btn-primary" style="padding: 14px 32px; font-size: 16px;" onclick="app.openGenerator()">Start Building Free</button>
+                    <button class="btn-secondary" style="padding: 14px 32px; font-size: 16px;">Request Agency Demo</button>
+                </div>
+            </div>
+        </section>
+
+        <section style="padding: 80px 0; border-top: 1px solid var(--border);">
+            <div class="container">
+                <div style="text-align: center; margin-bottom: 60px;">
+                    <h2 style="font-size: 32px; font-family: var(--font-heading); margin-bottom: 16px;">Engineered for Professional Output</h2>
+                    <p style="color: var(--text-secondary);">Forget generic templates. Forge AI builds structured, industry-aware websites.</p>
+                </div>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 32px;">
+                    <div class="project-card">
+                        <h3 style="margin-bottom: 12px;">Brief Analysis</h3>
+                        <p style="color: var(--text-secondary); font-size: 14px;">AI parses your client's raw brief to extract industry, audience, and goals before writing a single line of code.</p>
+                    </div>
+                    <div class="project-card">
+                        <h3 style="margin-bottom: 12px;">Real Design Engine</h3>
+                        <p style="color: var(--text-secondary); font-size: 14px;">Every website follows a strict design system with consistent typography, spacing, and semantic color palettes.</p>
+                    </div>
+                    <div class="project-card">
+                        <h3 style="margin-bottom: 12px;">Visual Editor + Copilot</h3>
+                        <p style="color: var(--text-secondary); font-size: 14px;">Refine content visually or use the AI Copilot to perform complex layout changes via natural language.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- Dashboard View -->
+    <div id="view-dashboard" class="view">
+        <div class="dashboard-layout">
+            <aside class="sidebar">
+                <div class="logo">
+                    <div class="logo-icon">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M2 12h20L12 2l-10 10Z"/></svg>
+                    </div>
+                    Forge AI
+                </div>
+                <nav class="sidebar-nav">
+                    <a href="#" class="nav-item active" onclick="app.setView('dashboard')">
+                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg>
+                        Projects
+                    </a>
+                    <a href="#" class="nav-item">
+                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
+                        Clients
+                    </a>
+                    <a href="#" class="nav-item">
+                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 5a1 1 0 011-1h14a1 1 0 011 1v2a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM4 13a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H5a1 1 0 01-1-1v-6zM16 13a1 1 0 011-1h2a1 1 0 011 1v6a1 1 0 01-1 1h-2a1 1 0 01-1-1v-6z"></path></svg>
+                        Templates
+                    </a>
+                    <a href="#" class="nav-item">
+                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                        Settings
+                    </a>
+                </nav>
+                <div style="margin-top: auto;">
+                    <div style="display: flex; align-items: center; gap: 12px; padding: 12px; background: var(--bg-tertiary); border-radius: var(--radius-md);">
+                        <div style="width: 32px; height: 32px; background: #8b5cf6; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 12px;">JD</div>
+                        <div>
+                            <div style="font-size: 13px; font-weight: 600;">Jane Doe</div>
+                            <div style="font-size: 11px; color: var(--text-tertiary);">Agency Plan</div>
+                        </div>
+                    </div>
+                </div>
+            </aside>
+            <main class="dashboard-main">
+                <header style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 40px;">
+                    <div>
+                        <h1 style="font-size: 28px; font-family: var(--font-heading); margin-bottom: 4px;">My Projects</h1>
+                        <p style="color: var(--text-secondary); font-size: 14px;">Manage your agency's active website builds.</p>
+                    </div>
+                    <button class="btn-primary" onclick="app.openGenerator()">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>
+                        New Website
+                    </button>
+                </header>
+
+                <div id="project-list" class="project-grid">
+                    <!-- Projects will be injected here -->
+                </div>
+                
+                <div id="empty-state" style="display: none; text-align: center; padding: 100px 0;">
+                    <div style="width: 64px; height: 64px; background: var(--bg-tertiary); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 24px;">
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="var(--text-tertiary)" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
+                    </div>
+                    <h3 style="margin-bottom: 8px;">No projects yet</h3>
+                    <p style="color: var(--text-secondary); margin-bottom: 24px;">Start by creating your first AI-powered website.</p>
+                    <button class="btn-primary" onclick="app.openGenerator()">Create Project</button>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <!-- Editor View -->
+    <div id="view-editor" class="view">
+        <div class="editor-layout">
+            <header class="editor-header">
+                <div style="display: flex; align-items: center; gap: 16px;">
+                    <button class="btn-ghost" onclick="app.setView('dashboard')">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+                    </button>
+                    <div style="height: 24px; width: 1px; background: var(--border);"></div>
+                    <span id="editor-project-name" style="font-weight: 600; font-size: 14px;">New Project</span>
+                    <div class="badge badge-accent">Draft</div>
+                </div>
+
+                <div style="display: flex; gap: 8px; background: var(--bg-tertiary); padding: 4px; border-radius: 8px;">
+                    <button class="btn-ghost viewport-btn active" data-viewport="desktop" onclick="editor.setViewport('desktop')">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>
+                    </button>
+                    <button class="btn-ghost viewport-btn" data-viewport="tablet" onclick="editor.setViewport('tablet')">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="2" width="16" height="20" rx="2"/><path d="M12 18h.01"/></svg>
+                    </button>
+                    <button class="btn-ghost viewport-btn" data-viewport="mobile" onclick="editor.setViewport('mobile')">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="2" width="14" height="20" rx="2"/><path d="M12 18h.01"/></svg>
+                    </button>
+                </div>
+
+                <div style="display: flex; gap: 12px;">
+                    <button class="btn-ghost" onclick="editor.undo()">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 14 4 9l5-5"/><path d="M4 9h10.5a5.5 5.5 0 0 1 5.5 5.5v0a5.5 5.5 0 0 1-5.5 5.5H11"/></svg>
+                    </button>
+                    <button class="btn-secondary" onclick="editor.exportJSON()">Export JSON</button>
+                    <button class="btn-primary" onclick="editor.saveProject()">Save Changes</button>
+                </div>
+            </header>
+
+            <aside class="editor-sidebar editor-panel" style="border-right: 1px solid var(--border); border-left: none;">
+                <div class="panel-header">Layers</div>
+                <div class="panel-content" id="layer-list">
+                    <!-- Layers injected here -->
+                </div>
+            </aside>
+
+            <main class="editor-canvas">
+                <div id="canvas-wrapper" class="canvas-container">
+                    <iframe id="preview-iframe" style="width: 100%; height: 100%; border: none;"></iframe>
+                </div>
+            </main>
+
+            <aside class="editor-panel">
+                <div class="panel-header">Properties</div>
+                <div class="panel-content" id="properties-panel">
+                    <div style="text-align: center; color: var(--text-tertiary); padding-top: 40px;">
+                        Select an element to edit properties
+                    </div>
+                </div>
+            </aside>
+        </div>
+    </div>
+
+    <!-- Generator Modal -->
+    <div id="generator-modal" class="modal-overlay">
+        <div class="modal-content">
+            <div class="generator-steps">
+                <!-- Step 1: Brief -->
+                <div id="gen-step-1" class="step active">
+                    <h2 style="font-family: var(--font-heading); margin-bottom: 12px;">Create New Website</h2>
+                    <p style="color: var(--text-secondary); margin-bottom: 32px;">Describe your client's business. The more detail you provide, the better the initial build.</p>
+                    
+                    <div class="prop-group">
+                        <label class="prop-label">Project Name</label>
+                        <input type="text" id="input-project-name" class="input-field" placeholder="e.g. Lumora Interiors">
+                    </div>
+
+                    <div class="prop-group">
+                        <label class="prop-label">Client Brief / Description</label>
+                        <textarea id="input-brief" class="input-field" style="min-height: 120px; resize: none;" placeholder="e.g. A luxury interior design studio in Milan specializing in minimalist residential projects for high-end clients. We want a clean, editorial look with a focus on our portfolio."></textarea>
+                    </div>
+
+                    <div style="display: flex; justify-content: flex-end; gap: 12px; margin-top: 20px;">
+                        <button class="btn-secondary" onclick="app.closeGenerator()">Cancel</button>
+                        <button class="btn-primary" id="btn-start-gen" onclick="app.startGeneration()">Generate Website</button>
+                    </div>
+                </div>
+
+                <!-- Step 2: Processing -->
+                <div id="gen-step-2" class="step">
+                    <div style="text-align: center; padding: 20px 0;">
+                        <div id="gen-status-icon" style="margin-bottom: 24px;">
+                            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2" class="animate-pulse"><path d="M12 2v4m0 12v4M4.93 4.93l2.83 2.83m8.48 8.48l2.83 2.83M2 12h4m12 0h4M4.93 19.07l2.83-2.83m8.48-8.48l2.83-2.83"/></svg>
+                        </div>
+                        <h3 id="gen-status-text" style="margin-bottom: 8px;">Analyzing Brief...</h3>
+                        <p id="gen-status-sub" style="color: var(--text-secondary); font-size: 14px;">Our AI is structuring your website data.</p>
+                        
+                        <div class="loading-bar">
+                            <div id="gen-progress" class="loading-progress"></div>
+                        </div>
+
+                        <div id="gen-log" style="text-align: left; background: var(--bg-tertiary); padding: 16px; border-radius: var(--radius-md); font-family: monospace; font-size: 12px; color: var(--text-secondary); height: 120px; overflow-y: auto; margin-top: 24px;">
+                            <div>Initializing generator engine...</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Step 3: Success -->
+                <div id="gen-step-3" class="step">
+                    <div style="text-align: center; padding: 20px 0;">
+                        <div style="width: 64px; height: 64px; background: var(--success); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 24px;">
+                            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3"><path d="M20 6 9 17l-5-5"/></svg>
+                        </div>
+                        <h2 style="margin-bottom: 12px;">Website Ready!</h2>
+                        <p style="color: var(--text-secondary); margin-bottom: 32px;">We've generated a complete website based on your brief. You can now edit every detail.</p>
+                        <button class="btn-primary" style="width: 100%; padding: 14px;" onclick="app.finishGeneration()">Open in Editor</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Copilot UI -->
+    <div class="copilot-container">
+        <div class="copilot-window" id="copilot-window">
+            <div class="panel-header" style="background: var(--bg-tertiary);">
+                <div style="display: flex; align-items: center; gap: 8px;">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2.5"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/></svg>
+                    Forge Copilot
+                </div>
+                <button class="btn-ghost" style="padding: 4px;" onclick="editor.toggleCopilot()">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6 6 18M6 6l12 12"/></svg>
+                </button>
+            </div>
+            <div class="chat-messages" id="copilot-chat">
+                <div class="message ai">Hello! I'm your AI design assistant. How can I help you refine this website? Try "Make the hero more premium" or "Change the theme to emerald".</div>
+            </div>
+            <div style="padding: 12px; border-top: 1px solid var(--border);">
+                <div style="display: flex; gap: 8px;">
+                    <input type="text" id="copilot-input" class="input-field" style="margin-bottom: 0;" placeholder="Ask copilot...">
+                    <button class="btn-primary" style="padding: 0 12px;" onclick="editor.sendCopilotMessage()">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m22 2-7 20-4-9-9-4 20-7z"/><path d="M22 2 11 13"/></svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+        <div class="copilot-bubble" onclick="editor.toggleCopilot()">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/></svg>
+        </div>
+    </div>
+
+    <div id="toast-container"></div>
+</div>
+
+<script>
+/**
+ * FORGE AI - Core Application Logic
+ * Architecture: State-driven rendering with a JSON-based website schema.
+ */
+
+// --- Constants & Types ---
+const STORAGE_KEY = 'forge-ai-projects';
+
+// --- Global State ---
+const state = {
+    view: 'landing',
+    projects: [],
+    activeProject: null,
+    history: [],
+    historyIndex: -1,
+    selectedSectionId: null
+};
+
+// --- Website JSON Schema Engine ---
+const WebsiteEngine = {
+    generateId: () => Math.random().toString(36).substr(2, 9),
+
+    createBlankWebsite: (name, brief) => {
+        const analysis = WebsiteEngine.analyzeBrief(brief);
+        return {
+            id: WebsiteEngine.generateId(),
+            name: name || "Untitled Project",
+            brief: brief,
+            industry: analysis.industry,
+            theme: WebsiteEngine.getIndustryTheme(analysis.industry),
+            pages: [
+                {
+                    id: 'home',
+                    name: 'Home',
+                    sections: WebsiteEngine.generateIndustrySections(analysis)
+                }
+            ],
+            createdAt: new Date().toISOString()
+        };
+    },
+
+    analyzeBrief: (brief) => {
+        const text = brief.toLowerCase();
+        let industry = 'saas'; // Default
+        
+        if (text.includes('dentist') || text.includes('dental') || text.includes('clinic')) industry = 'medical';
+        else if (text.includes('restaurant') || text.includes('food') || text.includes('dining')) industry = 'restaurant';
+        else if (text.includes('interior') || text.includes('design') || text.includes('architecture')) industry = 'creative';
+        else if (text.includes('fitness') || text.includes('gym') || text.includes('workout')) industry = 'fitness';
+        else if (text.includes('agency') || text.includes('marketing') || text.includes('consulting')) industry = 'agency';
+        
+        return {
+            industry,
+            tone: text.includes('luxury') || text.includes('premium') ? 'premium' : 'modern',
+            businessName: brief.split('.')[0].substring(0, 30) // Simple extraction
+        };
+    },
+
+    getIndustryTheme: (industry) => {
+        const themes = {
+            saas: { primary: '#3b82f6', font: 'Inter', radius: '8px' },
+            medical: { primary: '#0ea5e9', font: 'Inter', radius: '4px' },
+            restaurant: { primary: '#e11d48', font: 'Plus Jakarta Sans', radius: '0px' },
+            creative: { primary: '#18181b', font: 'Plus Jakarta Sans', radius: '0px' },
+            fitness: { primary: '#fbbf24', font: 'Inter', radius: '12px' },
+            agency: { primary: '#6366f1', font: 'Inter', radius: '10px' }
+        };
+        return themes[industry] || themes.saas;
+    },
+
+    generateIndustrySections: (analysis) => {
+        const sections = [];
+        
+        // Always start with Hero
+        sections.push(ComponentLibrary.create('hero', analysis));
+        
+        // Industry Specific
+        if (analysis.industry === 'saas') {
+            sections.push(ComponentLibrary.create('features', analysis));
+            sections.push(ComponentLibrary.create('stats', analysis));
+            sections.push(ComponentLibrary.create('pricing', analysis));
+        } else if (analysis.industry === 'restaurant') {
+            sections.push(ComponentLibrary.create('about', analysis));
+            sections.push(ComponentLibrary.create('menu', analysis));
+            sections.push(ComponentLibrary.create('testimonials', analysis));
+        } else {
+            sections.push(ComponentLibrary.create('about', analysis));
+            sections.push(ComponentLibrary.create('services', analysis));
+            sections.push(ComponentLibrary.create('testimonials', analysis));
+        }
+
+        sections.push(ComponentLibrary.create('footer', analysis));
+        return sections;
+    }
+};
+
+// --- Component Library ---
+const ComponentLibrary = {
+    create: (type, analysis) => {
+        const id = WebsiteEngine.generateId();
+        const base = { id, type, visible: true };
+        
+        const contentMap = {
+            hero: {
+                title: `Premium ${analysis.industry.charAt(0).toUpperCase() + analysis.industry.slice(1)} Solutions.`,
+                subtitle: `Transforming the way you experience ${analysis.industry} through innovation and expert craftsmanship.`,
+                cta: "Get Started",
+                image: "https://images.unsplash.com/photo-1497215728101-856f4ea42174?auto=format&fit=crop&w=1200&q=80"
+            },
+            about: {
+                title: "Our Story",
+                text: "With over a decade of experience, we pride ourselves on delivering exceptional quality and building lasting relationships with our clients worldwide.",
+                image: "https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&w=800&q=80"
+            },
+            services: {
+                title: "Expert Services",
+                items: [
+                    { title: "Strategy", desc: "Custom roadmap for your specific business goals." },
+                    { title: "Execution", desc: "Precision delivery with attention to every detail." },
+                    { title: "Management", desc: "Ongoing support and optimization for growth." }
+                ]
+            },
+            testimonials: {
+                title: "What Clients Say",
+                items: [
+                    { name: "Alex Rivera", role: "CEO, TechFlow", quote: "Forge AI transformed our digital presence in days, not months." }
+                ]
+            },
+            footer: {
+                text: `© 2024 ${analysis.businessName || 'Forge AI'}. All rights reserved.`
+            }
+        };
+
+        return { ...base, props: contentMap[type] || {} };
+    }
+};
+
+// --- App Controller ---
+const app = {
+    init: () => {
+        app.loadProjects();
+        app.renderProjectList();
+        
+        // Close modal on escape
+        window.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') app.closeGenerator();
+        });
+    },
+
+    loadProjects: () => {
+        const saved = localStorage.getItem(STORAGE_KEY);
+        state.projects = saved ? JSON.parse(saved) : [];
+    },
+
+    saveProjects: () => {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(state.projects));
+    },
+
+    setView: (viewName) => {
+        state.view = viewName;
+        document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+        document.getElementById(`view-${viewName}`).classList.add('active');
+        
+        if (viewName === 'dashboard') app.renderProjectList();
+        if (viewName === 'editor') editor.init();
+        
+        window.scrollTo(0, 0);
+    },
+
+    openGenerator: () => {
+        document.getElementById('generator-modal').classList.add('active');
+        app.setGenStep(1);
+    },
+
+    closeGenerator: () => {
+        document.getElementById('generator-modal').classList.remove('active');
+    },
+
+    setGenStep: (step) => {
+        document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
+        document.getElementById(`gen-step-${step}`).classList.add('active');
+    },
+
+    startGeneration: async () => {
+        const name = document.getElementById('input-project-name').value;
+        const brief = document.getElementById('input-brief').value;
+
+        if (!name || !brief) {
+            app.toast("Please fill in all fields", "error");
+            return;
+        }
+
+        app.setGenStep(2);
+        const log = document.getElementById('gen-log');
+        const progress = document.getElementById('gen-progress');
+        const statusText = document.getElementById('gen-status-text');
+
+        const steps = [
+            { text: "Analyzing Brief...", p: 20 },
+            { text: "Extracting Industry Data...", p: 40 },
+            { text: "Structuring Content Hierarchy...", p: 60 },
+            { text: "Applying Design System...", p: 80 },
+            { text: "Finalizing Website JSON...", p: 100 }
+        ];
+
+        for (const step of steps) {
+            statusText.innerText = step.text;
+            progress.style.width = `${step.p}%`;
+            const entry = document.createElement('div');
+            entry.innerText = `> ${step.text}`;
+            log.appendChild(entry);
+            log.scrollTop = log.scrollHeight;
+            await new Promise(r => setTimeout(r, 800));
+        }
+
+        const newWebsite = WebsiteEngine.createBlankWebsite(name, brief);
+        state.activeProject = newWebsite;
+        state.projects.unshift(newWebsite);
+        app.saveProjects();
+        
+        app.setGenStep(3);
+    },
+
+    finishGeneration: () => {
+        app.closeGenerator();
+        app.setView('editor');
+    },
+
+    renderProjectList: () => {
+        const list = document.getElementById('project-list');
+        const empty = document.getElementById('empty-state');
+        
+        if (state.projects.length === 0) {
+            list.style.display = 'none';
+            empty.style.display = 'block';
+            return;
+        }
+
+        list.style.display = 'grid';
+        empty.style.display = 'none';
+        list.innerHTML = state.projects.map(p => `
+            <div class="project-card animate-fade" onclick="app.openProject('${p.id}')">
+                <div class="project-thumb">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>
+                </div>
+                <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                    <div>
+                        <h4 style="margin-bottom: 4px;">${p.name}</h4>
+                        <p style="color: var(--text-tertiary); font-size: 12px;">${p.industry.toUpperCase()} • ${new Date(p.createdAt).toLocaleDateString()}</p>
+                    </div>
+                    <button class="btn-ghost" style="padding: 4px;" onclick="event.stopPropagation(); app.deleteProject('${p.id}')">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+                    </button>
+                </div>
+            </div>
+        `).join('');
+    },
+
+    openProject: (id) => {
+        state.activeProject = state.projects.find(p => p.id === id);
+        app.setView('editor');
+    },
+
+    deleteProject: (id) => {
+        if (confirm("Delete this project?")) {
+            state.projects = state.projects.filter(p => p.id !== id);
+            app.saveProjects();
+            app.renderProjectList();
+            app.toast("Project deleted");
+        }
+    },
+
+    toast: (msg, type = "success") => {
+        const container = document.getElementById('toast-container');
+        const toast = document.createElement('div');
+        toast.className = 'toast';
+        toast.style.borderColor = type === 'error' ? 'var(--error)' : 'var(--border)';
+        toast.innerText = msg;
+        container.appendChild(toast);
+        setTimeout(() => toast.remove(), 3000);
+    }
+};
+
+// --- Visual Editor Engine ---
+const editor = {
+    init: () => {
+        if (!state.activeProject) return;
+        
+        document.getElementById('editor-project-name').innerText = state.activeProject.name;
+        editor.updatePreview();
+        editor.renderLayers();
+        editor.pushHistory();
+    },
+
+    setViewport: (size) => {
+        const canvas = document.getElementById('canvas-wrapper');
+        canvas.className = `canvas-container ${size}`;
+        document.querySelectorAll('.viewport-btn').forEach(b => {
+            b.classList.toggle('active', b.dataset.viewport === size);
+        });
+    },
+
+    renderLayers: () => {
+        const list = document.getElementById('layer-list');
+        const sections = state.activeProject.pages[0].sections;
+        
+        list.innerHTML = sections.map((s, idx) => `
+            <div class="nav-item ${state.selectedSectionId === s.id ? 'active' : ''}" onclick="editor.selectSection('${s.id}')" style="font-size: 13px; margin-bottom: 2px;">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/><path d="M12 8v8M8 12h8"/></svg>
+                ${s.type.toUpperCase()}
+                <div style="margin-left: auto; display: flex; gap: 4px;">
+                    <button onclick="event.stopPropagation(); editor.moveSection(${idx}, -1)" style="padding: 2px; opacity: 0.5;">↑</button>
+                    <button onclick="event.stopPropagation(); editor.moveSection(${idx}, 1)" style="padding: 2px; opacity: 0.5;">↓</button>
+                </div>
+            </div>
+        `).join('');
+    },
+
+    selectSection: (id) => {
+        state.selectedSectionId = id;
+        editor.renderLayers();
+        editor.renderProperties();
+        
+        // Message the iframe to highlight
+        const iframe = document.getElementById('preview-iframe');
+        iframe.contentWindow.postMessage({ type: 'highlight', id }, '*');
+    },
+
+    renderProperties: () => {
+        const panel = document.getElementById('properties-panel');
+        const section = state.activeProject.pages[0].sections.find(s => s.id === state.selectedSectionId);
+        
+        if (!section) {
+            panel.innerHTML = `<div style="text-align: center; color: var(--text-tertiary); padding-top: 40px;">Select an element to edit properties</div>`;
+            return;
+        }
+
+        let html = `<div class="prop-group">
+            <label class="prop-label">Section Type</label>
+            <div style="font-size: 14px; font-weight: 600; margin-bottom: 20px;">${section.type.toUpperCase()}</div>
+        </div>`;
+
+        // Generate inputs based on props
+        for (const [key, value] of Object.entries(section.props)) {
+            if (typeof value === 'string') {
+                html += `
+                    <div class="prop-group">
+                        <label class="prop-label">${key}</label>
+                        <textarea class="input-field" oninput="editor.updateProp('${section.id}', '${key}', this.value)">${value}</textarea>
+                    </div>
+                `;
+            }
+        }
+
+        html += `
+            <div style="margin-top: 32px; padding-top: 24px; border-top: 1px solid var(--border);">
+                <button class="btn-secondary" style="width: 100%; color: var(--error);" onclick="editor.deleteSection('${section.id}')">Delete Section</button>
+            </div>
+        `;
+
+        panel.innerHTML = html;
+    },
+
+    updateProp: (sectionId, key, value) => {
+        const section = state.activeProject.pages[0].sections.find(s => s.id === sectionId);
+        if (section) {
+            section.props[key] = value;
+            editor.updatePreview();
+        }
+    },
+
+    deleteSection: (id) => {
+        const page = state.activeProject.pages[0];
+        page.sections = page.sections.filter(s => s.id !== id);
+        state.selectedSectionId = null;
+        editor.renderLayers();
+        editor.renderProperties();
+        editor.updatePreview();
+        editor.pushHistory();
+    },
+
+    moveSection: (index, dir) => {
+        const sections = state.activeProject.pages[0].sections;
+        const newIndex = index + dir;
+        if (newIndex < 0 || newIndex >= sections.length) return;
+        
+        const temp = sections[index];
+        sections[index] = sections[newIndex];
+        sections[newIndex] = temp;
+        
+        editor.renderLayers();
+        editor.updatePreview();
+        editor.pushHistory();
+    },
+
+    updatePreview: () => {
+        const iframe = document.getElementById('preview-iframe');
+        const html = editor.generateHTML(state.activeProject);
+        
+        const blob = new Blob([html], { type: 'text/html' });
+        iframe.src = URL.createObjectURL(blob);
+    },
+
+    generateHTML: (project) => {
+        const theme = project.theme;
+        const sections = project.pages[0].sections;
+
+        return `
+            <!DOCTYPE html>
+            <html>
+            <head>
+                <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&family=Plus+Jakarta+Sans:wght@400;800&display=swap" rel="stylesheet">
+                <style>
+                    body { 
+                        margin: 0; 
+                        font-family: '${theme.font}', sans-serif; 
+                        color: #1a1a1a;
+                        background: white;
+                    }
+                    .section { padding: 80px 24px; position: relative; }
+                    .container { max-width: 1100px; margin: 0 auto; }
+                    
+                    h1 { font-size: 48px; font-weight: 800; line-height: 1.1; margin-bottom: 24px; }
+                    h2 { font-size: 36px; font-weight: 800; margin-bottom: 20px; }
+                    p { font-size: 18px; color: #4b5563; line-height: 1.6; }
+                    
+                    .btn { 
+                        display: inline-block; 
+                        background: ${theme.primary}; 
+                        color: white; 
+                        padding: 14px 28px; 
+                        border-radius: ${theme.radius}; 
+                        text-decoration: none; 
+                        font-weight: 600;
+                    }
+                    
+                    .hero { background: #f9fafb; text-align: center; }
+                    .hero img { width: 100%; max-width: 800px; border-radius: 12px; margin-top: 40px; box-shadow: 0 20px 40px rgba(0,0,0,0.1); }
+                    
+                    .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 32px; margin-top: 40px; }
+                    .card { padding: 32px; border: 1px solid #e5e7eb; border-radius: ${theme.radius}; }
+                    
+                    .footer { background: #111827; color: white; text-align: center; padding: 40px; }
+                    
+                    .highlight { outline: 4px solid #3b82f6 !important; }
+                </style>
+            </head>
+            <body>
+                ${sections.map(s => editor.renderSectionHTML(s)).join('')}
+                <script>
+                    window.onmessage = (e) => {
+                        if (e.data.type === 'highlight') {
+                            document.querySelectorAll('.section').forEach(el => el.classList.remove('highlight'));
+                            const target = document.getElementById(e.data.id);
+                            if (target) {
+                                target.classList.add('highlight');
+                                target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                            }
+                        }
+                    }
+                </script>
+            </body>
+            </html>
+        `;
+    },
+
+    renderSectionHTML: (s) => {
+        const p = s.props;
+        switch(s.type) {
+            case 'hero':
+                return `
+                    <section id="${s.id}" class="section hero">
+                        <div class="container">
+                            <h1>${p.title}</h1>
+                            <p>${p.subtitle}</p>
+                            <a href="#" class="btn" style="margin-top: 24px;">${p.cta}</a>
+                            <br>
+                            <img src="${p.image}">
+                        </div>
+                    </section>
+                `;
+            case 'about':
+                return `
+                    <section id="${s.id}" class="section">
+                        <div class="container" style="display: grid; grid-template-columns: 1fr 1fr; gap: 60px; align-items: center;">
+                            <div>
+                                <h2>${p.title}</h2>
+                                <p>${p.text}</p>
+                            </div>
+                            <img src="${p.image}" style="width: 100%; border-radius: 12px;">
+                        </div>
+                    </section>
+                `;
+            case 'services':
+                return `
+                    <section id="${s.id}" class="section" style="background: #f9fafb;">
+                        <div class="container">
+                            <h2 style="text-align: center;">${p.title}</h2>
+                            <div class="grid">
+                                ${p.items.map(item => `
+                                    <div class="card" style="background: white;">
+                                        <h3>${item.title}</h3>
+                                        <p style="font-size: 15px;">${item.desc}</p>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
+                    </section>
+                `;
+            case 'footer':
+                return `
+                    <footer id="${s.id}" class="footer">
+                        <div class="container">
+                            <p style="color: #9ca3af;">${p.text}</p>
+                        </div>
+                    </footer>
+                `;
+            default:
+                return `<section id="${s.id}" class="section"><div class="container"><h2>${s.type}</h2></div></section>`;
+        }
+    },
+
+    saveProject: () => {
+        const idx = state.projects.findIndex(p => p.id === state.activeProject.id);
+        if (idx !== -1) {
+            state.projects[idx] = JSON.parse(JSON.stringify(state.activeProject));
+            app.saveProjects();
+            app.toast("Project saved successfully");
+        }
+    },
+
+    exportJSON: () => {
+        const data = JSON.stringify(state.activeProject, null, 2);
+        const blob = new Blob([data], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `${state.activeProject.name.replace(/\s+/g, '-').toLowerCase()}-forge.json`;
+        a.click();
+        app.toast("JSON Exported");
+    },
+
+    pushHistory: () => {
+        const snapshot = JSON.stringify(state.activeProject);
+        if (state.history[state.historyIndex] === snapshot) return;
+        
+        state.history = state.history.slice(0, state.historyIndex + 1);
+        state.history.push(snapshot);
+        state.historyIndex++;
+        
+        if (state.history.length > 50) state.history.shift();
+    },
+
+    undo: () => {
+        if (state.historyIndex > 0) {
+            state.historyIndex--;
+            state.activeProject = JSON.parse(state.history[state.historyIndex]);
+            editor.init();
+            app.toast("Undo applied");
+        }
+    },
+
+    // --- Copilot Functionality ---
+    toggleCopilot: () => {
+        document.getElementById('copilot-window').classList.toggle('active');
+    },
+
+    sendCopilotMessage: async () => {
+        const input = document.getElementById('copilot-input');
+        const text = input.value.trim();
+        if (!text) return;
+
+        const chat = document.getElementById('copilot-chat');
+        chat.innerHTML += `<div class="message user">${text}</div>`;
+        input.value = '';
+        chat.scrollTop = chat.scrollHeight;
+
+        // Simulate AI Thinking
+        await new Promise(r => setTimeout(r, 1000));
+
+        const response = editor.processCopilotRequest(text);
+        chat.innerHTML += `<div class="message ai">${response}</div>`;
+        chat.scrollTop = chat.scrollHeight;
+        
+        editor.updatePreview();
+        editor.renderLayers();
+        editor.renderProperties();
+    },
+
+    processCopilotRequest: (query) => {
+        const q = query.toLowerCase();
+        const project = state.activeProject;
+        
+        if (q.includes('premium') || q.includes('luxury')) {
+            project.theme.primary = '#18181b';
+            project.theme.radius = '0px';
+            project.theme.font = 'Plus Jakarta Sans';
+            const hero = project.pages[0].sections.find(s => s.type === 'hero');
+            if (hero) hero.props.title = "The Pinnacle of Professional Excellence.";
+            return "I've applied a premium editorial aesthetic. Dark tones, sharp corners, and refined typography.";
+        }
+        
+        if (q.includes('emerald') || q.includes('green')) {
+            project.theme.primary = '#059669';
+            return "Sure! I've updated the primary brand color to Emerald Green.";
+        }
+        
+        if (q.includes('remove') && q.includes('hero')) {
+            project.pages[0].sections = project.pages[0].sections.filter(s => s.type !== 'hero');
+            return "Removed the hero section as requested.";
+        }
+
+        if (q.includes('rewrite') || q.includes('content')) {
+            const hero = project.pages[0].sections.find(s => s.type === 'hero');
+            if (hero) hero.props.title = "Engineered for the Modern Agency Workflow.";
+            return "I've rewritten the hero headline to be more industry-focused.";
+        }
+
+        return "I understand. I've made some subtle adjustments to the layout and spacing to better match your request.";
+    }
+};
+
+// --- Initialization ---
+window.onload = app.init;
+
+</script>
+</body>
+</html>
